@@ -1,19 +1,27 @@
 package com.example.listmaker
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.content_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),
+    ListSelectionRecyclerViewAdapter.ListSelectionRecyclerViewClickListener {
+
+    override fun listItemClicked(list: TaskList) {
+        showListDetail(list)
+    }
+
+    companion object {
+        const val INTENT_LIST_KEY = "list"
+    }
 
     val listDataManager: ListDataManager = ListDataManager(this)
 
@@ -29,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val lists = listDataManager.readList()
 
         lists_recyclerview.layoutManager = LinearLayoutManager(this)
-        lists_recyclerview.adapter = ListSelectionRecyclerViewAdapter(lists)
+        lists_recyclerview.adapter = ListSelectionRecyclerViewAdapter(lists,this)
 
     }
 
@@ -49,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showCreateListDialog(){
+    private fun showCreateListDialog() {
         // get values of strings
         val dialogTitle = getString(R.string.name_of_list)
         val positiveButtonTitle = getString(R.string.create_list)
@@ -63,8 +71,7 @@ class MainActivity : AppCompatActivity() {
         builder.setTitle(dialogTitle)
         builder.setView(listTitleEditText)
         // add positive button to dialog
-        builder.setPositiveButton(positiveButtonTitle) {
-            dialog, _ ->
+        builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
 
             val list = TaskList(listTitleEditText.text.toString())
             listDataManager.saveList(list)
@@ -73,8 +80,15 @@ class MainActivity : AppCompatActivity() {
             recyclerAdapter.addList(list)
 
             dialog.dismiss()
+            showListDetail(list)
         }
         // create the dialog and show
         builder.create().show()
+    }
+
+    private fun showListDetail(list: TaskList) {
+        val listDetailIntent = Intent(this, ListDetailActivity::class.java)
+        listDetailIntent.putExtra(INTENT_LIST_KEY, list)
+        startActivity(listDetailIntent)
     }
 }
