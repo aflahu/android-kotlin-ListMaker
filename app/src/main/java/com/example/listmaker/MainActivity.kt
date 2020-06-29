@@ -1,11 +1,14 @@
 package com.example.listmaker
 
 import android.os.Bundle
+import android.text.InputType
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.content_main.*
@@ -20,8 +23,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            showCreateListDialog()
         }
 
         lists_recyclerview.layoutManager = LinearLayoutManager(this)
@@ -43,5 +45,26 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun showCreateListDialog(){
+        // get values of strings
+        val dialogTitle = getString(R.string.name_of_list)
+        val positiveButtonTitle = getString(R.string.create_list)
+
+        // create an allertDialog.builder, editText
+        val builder = AlertDialog.Builder(this)
+        val listTitleEditText = EditText(this)
+        listTitleEditText.inputType = InputType.TYPE_CLASS_TEXT // text input type where show hint
+
+        // set title and content view
+        builder.setTitle(dialogTitle)
+        builder.setView(listTitleEditText)
+        // add positive button to dialog
+        builder.setPositiveButton(positiveButtonTitle) {
+            dialog, _ -> dialog.dismiss()
+        }
+        // create the dialog and show
+        builder.create().show()
     }
 }
